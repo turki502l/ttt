@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>موقع شخصي - تركي</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 40px 0;
+    }
+    header .profile-image {
+      font-size: 100px;
+      font-weight: bold;
+      color: #fff;
+      background-color: #3498db;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+    }
+    .content {
+      padding: 20px;
+    }
+    .section {
+      background-color: white;
+      margin: 20px;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .social-links a {
+      margin: 0 10px;
+      font-size: 20px;
+      color: #3498db;
+      text-decoration: none;
+    }
+    .social-links a:hover {
+      color: #2980b9;
+    }
+
+    /* تعديل مظهر اللعبة */
+    #gameCanvas {
+      border: 2px solid #000;
+      background-color: #fff;
+      margin: 20px 0;
+    }
+    .controls {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    .control-btn {
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+    .control-btn:hover {
+      background-color: #2980b9;
+    }
+
+    /* زر بدء اللعبة */
+    #startBtn {
+      padding: 10px 20px;
+      background-color: #3498db;
+      color: white;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    #startBtn:hover {
+      background-color: #2980b9;
+    }
+
+    /* إخفاء مساحة اللعبة والقائمة عند بداية */
+    #gameArea, #gameOptions {
+      display: none;
+    }
+
+    /* تنسيق القائمة الخاصة باللعبة */
+    #gameOptions {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ترتيب الأزرار بشكل منظم */
+    .control-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .control-btn-row {
+      display: flex;
+      justify-content: center;
+      margin: 10px 0;
+    }
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="profile-image">
+      T
+    </div>
+    <h1>مرحبًا، أنا تركي!</h1>
+    <p>هذا هو موقعك الشخصي حيث يمكنك مشاركة صورك ومعلوماتك.</p>
+  </header>
+
+  <div class="content">
+    <!-- قسم عنك -->
+    <div class="section">
+      <h2>من أنا؟</h2>
+      <p>اسمي تركي، أنا مهتم بتعلم البرمجة وتطوير المهارات الشخصية. أحب التصوير والسفر والتعلم.</p>
+    </div>
+
+    <!-- روابط التواصل الاجتماعي -->
+    <div class="section social-links">
+      <h2>تواصل معي</h2>
+      <a href="https://www.instagram.com/lqemjl" target="_blank">إنستجرام</a>
+      <a href="https://www.snapchat.com/add/rgj.4" target="_blank">سناب شات</a>
+    </div>
+
+    <!-- زر بدء اللعبة -->
+    <button id="startBtn">ابدأ اللعبة</button>
+
+    <!-- قائمة اختيار اللعبة تظهر أسفل زر البدء -->
+    <div id="gameOptions">
+      <h3>خيارات اللعبة</h3>
+      <button id="beginGame">ابدأ اللعبة الآن</button>
+    </div>
+
+    <!-- مساحة اللعب (مخفية أولًا) -->
+    <div id="gameArea">
+      <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+      <!-- أزرار التحكم -->
+      <div class="control-container">
+        <div class="control-btn-row">
+          <button class="control-btn" id="up">↑</button>
+        </div>
+        <div class="control-btn-row">
+          <button class="control-btn" id="left">←</button>
+          <button class="control-btn" id="right">→</button>
+        </div>
+        <div class="control-btn-row">
+          <button class="control-btn" id="down">↓</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // لعبة الثعبان
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let snake = [{ x: 10, y: 10 }];
+    let food = { x: 15, y: 15 };
+    let direction = 'RIGHT';
+    let gameInterval;
+    let gameStarted = false;
+
+    const gridSize = 20;
+    const canvasSize = 400;
+
+    // رسم الثعبان
+    function drawSnake() {
+      for (let i = 0; i < snake.length; i++) {
+        ctx.fillStyle = i === 0 ? '#00FF00' : '#008000'; // الرأس أخضر لامع والجسم أخضر غامق
+        ctx.fillRect(snake[i].x * gridSize, snake[i].y * gridSize, gridSize, gridSize);
+      }
+    }
+
+    // رسم الطعام
+    function drawFood() {
+      ctx.fillStyle = '#FF0000'; // اللون الأحمر للطعام
+      ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
+    }
+
+    // تحديث موقع الثعبان
+    function updateSnake() {
+      const head = { ...snake[0] };
+      
+      if (direction === 'UP') head.y--;
+      if (direction === 'DOWN') head.y++;
+      if (direction === 'LEFT') head.x--;
+      if (direction === 'RIGHT') head.x++;
+
+      snake.unshift(head);
+
+      // إذا أكل الثعبان الطعام
+      if (head.x === food.x && head.y === food.y) {
+        food = { x: Math.floor(Math.random() * (canvasSize / gridSize)), y: Math.floor(Math.random() * (canvasSize / gridSize)) };
+      } else {
+        snake.pop();
+      }
+    }
+
+    // تحقق من الاصطدام (الجدران أو نفسه)
+    function checkCollision() {
+      const head = snake[0];
+      if (head.x < 0 || head.x >= canvasSize / gridSize || head.y < 0 || head.y >= canvasSize / gridSize) {
+        return true; // اصطدم بالجدار
+      }
+
+      for (let i = 1; i < snake.length; i++) {
+        if (head.x === snake[i].x && head.y === snake[i].y) {
+          return true; // اصطدم بنفسه
+        }
+      }
+
+      return false;
+    }
+
+    // رسم اللعبة
+    function drawGame() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawSnake();
+      drawFood();
+      updateSnake();
+
+      if (checkCollision()) {
+        clearInterval(gameInterval);
+        alert('انتهت اللعبة!');
+        gameStarted = false;
+        document.getElementById('gameArea').style.display = 'none'; // إخفاء مساحة اللعب بعد انتهاء اللعبة
+      }
+    }
+
+    // بدء اللعبة عند الضغط على زر "ابدأ اللعبة"
+    document.getElementById('startBtn').addEventListener('click', function() {
+      document.getElementById('gameOptions').style.display = 'block'; // إظهار قائمة الخيارات أسفل الزر
+    });
+
+    // بدء اللعبة عند الضغط على زر "ابدأ اللعبة الآن"
+    document.getElementById('beginGame').addEventListener('click', function() {
+      gameStarted = true;
+      snake = [{ x: 10, y: 10 }];
+      direction = 'RIGHT';
+      food = { x: 15, y: 15 };
+      document.getElementById('gameArea').style.display = 'block'; // إظهار مساحة اللعب
+      document.getElementById('gameOptions').style.display = 'none'; // إخفاء قائمة الخيارات
+      gameInterval = setInterval(drawGame, 100); // تحديث اللعبة كل 100 ملي ثانية
+    });
+
+    // تحكم أزرار اللعبة
+    document.getElementById('up').addEventListener('click', function() {
+      if (direction !== 'DOWN') direction = 'UP';
+    });
+    document.getElementById('down').addEventListener('click', function() {
+      if (direction !==
